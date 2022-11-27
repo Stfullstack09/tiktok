@@ -14,50 +14,6 @@ export const LoadingHome = () => {
                     }}
                 ></Skeleton>
             </div>
-            <Skeleton height={50}></Skeleton>
-            <div className="d-flex overflow-hidden mt-2">
-                <Skeleton height={220} width={700}></Skeleton>
-                <Skeleton
-                    height={220}
-                    width={100}
-                    style={{
-                        marginLeft: 14,
-                    }}
-                ></Skeleton>
-            </div>
-            <Skeleton height={50}></Skeleton>
-            <div className="d-flex overflow-hidden mt-2">
-                <Skeleton height={220} width={700}></Skeleton>
-                <Skeleton
-                    height={220}
-                    width={100}
-                    style={{
-                        marginLeft: 14,
-                    }}
-                ></Skeleton>
-            </div>
-            <Skeleton height={50}></Skeleton>
-            <div className="d-flex overflow-hidden mt-2">
-                <Skeleton height={220} width={700}></Skeleton>
-                <Skeleton
-                    height={220}
-                    width={100}
-                    style={{
-                        marginLeft: 14,
-                    }}
-                ></Skeleton>
-            </div>
-            <Skeleton height={50}></Skeleton>
-            <div className="d-flex overflow-hidden mt-2">
-                <Skeleton height={220} width={700}></Skeleton>
-                <Skeleton
-                    height={220}
-                    width={100}
-                    style={{
-                        marginLeft: 14,
-                    }}
-                ></Skeleton>
-            </div>
         </div>
     );
 };

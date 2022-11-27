@@ -5,6 +5,7 @@ import { BrowserView, MobileView } from 'react-device-detect';
 import Slider from 'react-slick';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useCallback } from 'react';
 
 import ItemVideo from './ItemVideo';
@@ -52,21 +53,14 @@ function Home() {
 
     const [listVideo, setListVideo] = useState([]);
     const [metaVideo, setMetaVideo] = useState({});
-    const [heightPage, setHeightPage] = useState(+0);
-    const [WindowScollY, setWindowScollY] = useState(+0);
+    // const [heightPage, setHeightPage] = useState(+0);
+    // const [WindowScollY, setWindowScollY] = useState(+0);
     const [type, setType] = useState('for-you');
     const [page, setPage] = useState(1);
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenSkeloton, setIsOpenSkeloton] = useState(false);
     const [isShow, setIsShow] = useState(true);
     const [view, setView] = useState('');
-
-    // useEffect(() => {
-    //     setListVideo((prev) => [...prev, ...listVideoLimit]);
-
-    //     return;
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [listVideoLimit]);
 
     useEffect(() => {
         if (listVideo && listVideo.length > 0) {
@@ -113,41 +107,13 @@ function Home() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
-    const listenScrollEvent = () => {
-        if (window.scrollY <= 70) {
-            setView('');
-        } else if (window.scrollY >= 70) {
-            setView('view__slide__down');
-        }
-
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-            setWindowScollY(Math.floor(window.innerHeight + window.scrollY));
-        }
-
-        if (heightPage !== document.documentElement.scrollHeight) {
-            setHeightPage(Math.floor(document.documentElement.scrollHeight));
+    const handleLoadMore = () => {
+        if (!_.isEmpty(metaVideo) && page === metaVideo.total_pages) {
+            setPage((prev) => prev);
+        } else {
+            setPage((prev) => prev + 1);
         }
     };
-
-    useEffect(() => {
-        if ((WindowScollY === heightPage || WindowScollY === heightPage - 1) && WindowScollY > 6000) {
-            if (!_.isEmpty(metaVideo) && page === metaVideo.total_pages) {
-                setPage((prev) => prev);
-            } else {
-                setPage((prev) => prev + 1);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [WindowScollY, heightPage]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', listenScrollEvent);
-
-        return () => {
-            window.removeEventListener('scroll', listenScrollEvent);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const handleClickHeart = (uuid, token, toggle) => {
         if (!toggle) {
@@ -193,25 +159,32 @@ function Home() {
     return (
         <>
             <BrowserView>
-                <div className="home-page-container">
-                    {listVideo &&
-                        listVideo.length > 0 &&
-                        listVideo.map((data, index) => (
-                            <ItemVideo
-                                handleToggleModal={handleToggleModal}
-                                data={data}
-                                handleClickHeart={handleClickHeart}
-                                key={!_.isEqual(data) && !_.isEqual(data.user) && index}
-                            />
-                        ))}
-                </div>
-                {isOpenSkeloton && <Skeloton />}
-                {isOpen && <ModalRender handleToggleModal={handleToggleModal} isOpen={isOpen} />}
-                <div className={view ? 'scroll-top animation-btn' : 'scroll-top'} onClick={handleScroll}>
-                    <button type="submit">
-                        <FontAwesomeIcon icon={faAngleUp} />
-                    </button>
-                </div>
+                <InfiniteScroll
+                    dataLength={listVideo.length} //This is important field to render the next data
+                    next={handleLoadMore}
+                    hasMore={true}
+                    loader={<h2>Đang tải thêm dữ liệu......</h2>}
+                >
+                    <div className="home-page-container">
+                        {listVideo &&
+                            listVideo.length > 0 &&
+                            listVideo.map((data, index) => (
+                                <ItemVideo
+                                    handleToggleModal={handleToggleModal}
+                                    data={data}
+                                    handleClickHeart={handleClickHeart}
+                                    key={!_.isEqual(data) && !_.isEqual(data.user) && index}
+                                />
+                            ))}
+                    </div>
+                    {isOpenSkeloton && <Skeloton />}
+                    {isOpen && <ModalRender handleToggleModal={handleToggleModal} isOpen={isOpen} />}
+                    <div className={view ? 'scroll-top animation-btn' : 'scroll-top'} onClick={handleScroll}>
+                        <button type="submit">
+                            <FontAwesomeIcon icon={faAngleUp} />
+                        </button>
+                    </div>
+                </InfiniteScroll>
             </BrowserView>
             <MobileView>
                 <div className="home-page-container-mobile">

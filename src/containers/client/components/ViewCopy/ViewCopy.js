@@ -20,6 +20,7 @@ import * as Actions from '../../../.././store/actions';
 import useGetToken from '../../../../components/hooks/useGetToken';
 import { IconEmoj } from '../../../.././components/Icons';
 import ModalRender from '../../../.././components/Popper/Modal';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 function ViewCopy() {
     const disPatch = useDispatch();
@@ -39,8 +40,6 @@ function ViewCopy() {
     const [page, setPage] = useState(1);
     const [isRender, setIsRender] = useState(false);
     const [detailFollow, setDetailFollow] = useState({});
-    const [heightPage, setHeightPage] = useState(+0);
-    const [WindowScollY, setWindowScollY] = useState(+0);
 
     const paramUuid = useParams();
 
@@ -115,35 +114,13 @@ function ViewCopy() {
         disPatch(Actions.createNewComment(dataBuild, paramUuid.uuid, token));
     };
 
-    const listenScrollEvent = () => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-            setWindowScollY(Math.floor(window.innerHeight + window.scrollY));
-        }
-
-        if (heightPage !== document.documentElement.scrollHeight) {
-            setHeightPage(Math.floor(document.documentElement.scrollHeight));
+    const handleLoadMore = () => {
+        if (!_.isEmpty(metaVideo) && page === metaVideo.total_pages) {
+            setPage((prev) => prev);
+        } else {
+            setPage((prev) => prev + 1);
         }
     };
-
-    useEffect(() => {
-        if (WindowScollY === heightPage || WindowScollY === heightPage - 1) {
-            if (!_.isEmpty(metaVideo) && page === metaVideo.total_pages) {
-                setPage((prev) => prev);
-            } else {
-                setPage((prev) => prev + 1);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [WindowScollY, heightPage]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', listenScrollEvent);
-
-        return () => {
-            window.removeEventListener('scroll', listenScrollEvent);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const handleToggleModal = () => {
         setIsOpen(!isOpen);
@@ -167,10 +144,6 @@ function ViewCopy() {
     useEffect(() => {
         setDetailFollow(detailFollowAndUnFollow);
     }, [detailFollowAndUnFollow]);
-
-    console.log('check page :', page);
-    console.log('check heightPage :', heightPage);
-    console.log('check WindowScollY :', WindowScollY);
 
     return (
         <div className="view-copy-link-wrapper">
@@ -285,16 +258,23 @@ function ViewCopy() {
                                         </div>
                                     </div>
                                     <div className="col-4 offer-videos">
-                                        <div className="container">
-                                            <span className="jsx-back-for-you">Offer Videos</span>
-                                            <div className="row">
-                                                {listVideo &&
-                                                    listVideo.length > 0 &&
-                                                    listVideo.map((item, index) => (
-                                                        <RenderItemViewCopy data={item} key={index} />
-                                                    ))}
+                                        <InfiniteScroll
+                                            dataLength={listVideo.length} //This is important field to render the next data
+                                            next={handleLoadMore}
+                                            hasMore={true}
+                                            loader={<h4>Loading...</h4>}
+                                        >
+                                            <div className="container">
+                                                <span className="jsx-back-for-you">Offer Videos</span>
+                                                <div className="row">
+                                                    {listVideo &&
+                                                        listVideo.length > 0 &&
+                                                        listVideo.map((item, index) => (
+                                                            <RenderItemViewCopy data={item} key={index} />
+                                                        ))}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </InfiniteScroll>
                                     </div>
                                 </div>
                             </div>
